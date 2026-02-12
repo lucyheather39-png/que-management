@@ -95,6 +95,7 @@ def admin_required(view_func):
     """
     Decorator to ensure user is authenticated and is an admin.
     Properly redirects non-admin authenticated users with an error message.
+    Also prevents browser caching of admin pages to ensure fresh content.
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -111,7 +112,14 @@ def admin_required(view_func):
                 return redirect('/queue/dashboard/')
             
             # Call the view function
-            return view_func(request, *args, **kwargs)
+            response = view_func(request, *args, **kwargs)
+            
+            # Prevent browser caching of admin pages
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            
+            return response
         
         except Exception as e:
             logger.exception(f'Admin decorator error for user {request.user.id}: {str(e)}')
