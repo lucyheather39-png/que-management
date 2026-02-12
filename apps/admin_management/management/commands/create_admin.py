@@ -35,4 +35,3 @@ class Command(BaseCommand):
                     f'Successfully updated superuser "{username}" credentials'
                 )
             )
-            )
