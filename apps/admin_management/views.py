@@ -274,7 +274,6 @@ def approve_verification_view(request, verification_id):
     return render(request, 'pages/admin/approve_verification.html', context)
 
 @admin_required
-@admin_required
 def pending_appointments_view(request):
     appointments = Appointment.objects.filter(status='pending').order_by('-created_at')
     
@@ -391,7 +390,6 @@ def check_account_status_view(request, user_profile_id):
 
 
 @admin_required
-@admin_required
 def verify_user_profile_view(request, user_profile_id):
     """Verify a user profile"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -431,7 +429,6 @@ def unverify_user_profile_view(request, user_profile_id):
     return render(request, 'pages/admin/check_account_status.html', context)
 
 
-@admin_required
 @admin_required
 def admin_logs_view(request):
     logs = AdminLog.objects.all().order_by('-timestamp')[:100]
@@ -514,7 +511,6 @@ def delete_admin_view(request, admin_id):
 
 # Status Verification Views
 
-@admin_required
 @admin_required
 def verify_user_status_view(request, user_id):
     """View to verify user's verification status"""
@@ -644,7 +640,6 @@ def user_verification_stats_view(request):
 
 
 @admin_required
-@admin_required
 def unverified_users_view(request):
     """View all unverified users"""
     data = get_all_unverified_users()
@@ -680,7 +675,6 @@ def inactive_users_view(request):
     return render(request, 'pages/admin/inactive_users.html', context)
 
 
-@admin_required
 @admin_required
 def verify_user_account_view(request, user_id):
     """Verify a user account"""
