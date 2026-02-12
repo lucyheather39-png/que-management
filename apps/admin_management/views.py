@@ -432,6 +432,7 @@ def unverify_user_profile_view(request, user_profile_id):
 
 
 @admin_required
+@admin_required
 def admin_logs_view(request):
     logs = AdminLog.objects.all().order_by('-timestamp')[:100]
     
