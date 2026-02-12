@@ -98,14 +98,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Security settings for production
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+# Don't force HTTPS redirect - Render handles this at the load balancer
+# Only enable these if truly needed
+if os.getenv('ENVIRONMENT') == 'production':
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_SECURITY_POLICY = {
-        'default-src': ("'self'",),
-    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
