@@ -45,7 +45,13 @@
                                     <tr>
                                         <td><strong>{{ verification.user.get_full_name }}</strong></td>
                                         <td>{{ verification.user.email }}</td>
-                                        <td>{{ verification.user.profile.get_citizen_type_display }}</td>
+                                        <td>
+                                            {% if verification.user.profile %}
+                                                {{ verification.user.profile.get_citizen_type_display }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
                                         <td>{{ verification.created_at|date:"M d, Y" }}</td>
                                         <td><span class="badge bg-warning">Pending Review</span></td>
                                         <td>
@@ -66,7 +72,7 @@
                                 
                                 <!-- Unverified Users (without explicit VerificationRequest) -->
                                 {% for user in unverified_users %}
-                                    {% if user.id not in verification_ids %}
+                                    {% if user.profile and user.id not in verification_ids %}
                                     <tr style="background-color: #f9f5f0;">
                                         <td><strong>{{ user.get_full_name }}</strong></td>
                                         <td>{{ user.email }}</td>

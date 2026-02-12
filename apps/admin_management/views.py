@@ -193,23 +193,31 @@ def admin_dashboard_view(request):
 
 @admin_required
 def pending_verifications_view(request):
-    # Get all unverified users (not just VerificationRequest records)
-    unverified_users = User.objects.filter(
-        profile__is_verified=False
-    ).select_related('profile').order_by('-profile__updated_at')
+    import logging
+    logger = logging.getLogger(__name__)
     
-    # Also get explicit pending VerificationRequest records
-    pending_requests = VerificationRequest.objects.filter(status='pending').select_related('user', 'user__profile').order_by('-created_at')
-    
-    # Combine and deduplicate - prefer VerificationRequest data
-    verification_ids = set(pending_requests.values_list('user_id', flat=True))
-    
-    context = {
-        'verifications': pending_requests,
-        'unverified_users': unverified_users,
-        'verification_ids': verification_ids,
-    }
-    return render(request, 'pages/admin/pending_verifications.html', context)
+    try:
+        # Get all unverified users (not just VerificationRequest records)
+        unverified_users = User.objects.filter(
+            profile__is_verified=False
+        ).select_related('profile').order_by('-profile__updated_at')
+        
+        # Also get explicit pending VerificationRequest records
+        pending_requests = VerificationRequest.objects.filter(status='pending').select_related('user', 'user__profile').order_by('-created_at')
+        
+        # Combine and deduplicate - prefer VerificationRequest data
+        verification_ids = set(pending_requests.values_list('user_id', flat=True))
+        
+        context = {
+            'verifications': pending_requests,
+            'unverified_users': unverified_users,
+            'verification_ids': verification_ids,
+        }
+        return render(request, 'pages/admin/pending_verifications.html', context)
+    except Exception as e:
+        logger.exception(f'Error in pending_verifications_view: {str(e)}')
+        messages.error(request, f'Error loading pending verifications: {str(e)}')
+        return redirect('admin_management:dashboard')
 
 
 @admin_required
@@ -275,12 +283,20 @@ def approve_verification_view(request, verification_id):
 
 @admin_required
 def pending_appointments_view(request):
-    appointments = Appointment.objects.filter(status='pending').order_by('-created_at')
+    import logging
+    logger = logging.getLogger(__name__)
     
-    context = {
-        'appointments': appointments,
-    }
-    return render(request, 'pages/admin/pending_appointments.html', context)
+    try:
+        appointments = Appointment.objects.filter(status='pending').order_by('-created_at')
+        
+        context = {
+            'appointments': appointments,
+        }
+        return render(request, 'pages/admin/pending_appointments.html', context)
+    except Exception as e:
+        logger.exception(f'Error in pending_appointments_view: {str(e)}')
+        messages.error(request, f'Error loading pending appointments: {str(e)}')
+        return redirect('admin_management:dashboard')
 
 @admin_required
 def manage_appointment_view(request, appointment_id):
