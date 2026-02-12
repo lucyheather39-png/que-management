@@ -46,6 +46,7 @@ class Queue(models.Model):
     served_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     date = models.DateField(default=timezone.now)
+    is_walkin = models.BooleanField(default=False, help_text='Walk-in customer without appointment')
     
     class Meta:
         db_table = 'queue'
