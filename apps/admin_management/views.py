@@ -60,20 +60,23 @@ def setup_first_admin(request):
     if request.method == 'POST':
         form = AdminCreationForm(request.POST)
         if form.is_valid():
-            admin_user = form.save()
-            
-            # Create a UserProfile for the admin
-            from apps.accounts.models import UserProfile
-            UserProfile.objects.get_or_create(
-                user=admin_user,
-                defaults={
-                    'citizen_type': 'regular',
-                    'is_verified': True
-                }
-            )
-            
-            messages.success(request, 'Admin account created successfully! You can now login.')
-            return redirect('security:login')
+            try:
+                admin_user = form.save()
+                
+                # Create a UserProfile for the admin
+                from apps.accounts.models import UserProfile
+                UserProfile.objects.get_or_create(
+                    user=admin_user,
+                    defaults={
+                        'citizen_type': 'regular',
+                        'is_verified': True
+                    }
+                )
+                
+                messages.success(request, f'Admin account "{admin_user.username}" created successfully! You can now login.')
+                return redirect('security:login')
+            except Exception as e:
+                messages.error(request, f'Error creating admin account: {str(e)}')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -84,6 +87,7 @@ def setup_first_admin(request):
     context = {
         'form': form,
         'is_setup': True,
+        'title': 'Initial Setup - Create Admin Account',
     }
     return render(request, 'pages/admin/setup_admin.html', context)
 
