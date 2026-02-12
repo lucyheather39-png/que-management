@@ -1,9 +1,11 @@
 from django.urls import path
+from django.http import HttpResponseRedirect
 from . import views
 
 app_name = 'queues'
 
 urlpatterns = [
+    path('', lambda request: HttpResponseRedirect('/queue/dashboard/'), name='queue_root'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('take/', views.take_queue_view, name='take_queue'),
     path('detail/<int:queue_id>/', views.queue_detail_view, name='queue_detail'),
