@@ -1,0 +1,146 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Dashboard - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mb-4 mt-4">
+    <div class="col">
+        <h2 class="fw-bold">Dashboard</h2>
+    </div>
+</div>
+
+{% if active_queue %}
+<div class="alert alert-info">
+    <strong>Active Queue:</strong> You have a queue number <strong>{{ active_queue.queue_number }}</strong> 
+    for {{ active_queue.service.name }}. Status: <span class="badge bg-primary">{{ active_queue.get_status_display }}</span>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-bottom">
+                <h6 class="mb-0">Your Queues Today</h6>
+            </div>
+            <div class="card-body">
+                {% if user_queues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Queue Number</th>
+                                    <th>Service</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for queue in user_queues %}
+                                    <tr>
+                                        <td><strong>{{ queue.queue_number }}</strong></td>
+                                        <td>{{ queue.service.name }}</td>
+                                        <td>
+                                            {% if queue.priority_level == 1 %}
+                                                <span class="badge bg-danger">Senior Citizen</span>
+                                            {% elif queue.priority_level == 2 %}
+                                                <span class="badge bg-warning">PWD</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Regular</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if queue.status == 'waiting' %}
+                                                <span class="badge bg-info">Waiting</span>
+                                            {% elif queue.status == 'serving' %}
+                                                <span class="badge bg-primary">Serving</span>
+                                            {% elif queue.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ queue.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ queue.created_at|time:"H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'queues:queue_detail' queue.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                            {% if queue.status == 'waiting' %}
+                                                <a href="{% url 'queues:cancel_queue' queue.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel queue?')">Cancel</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No queues yet. <a href="{% url 'queues:take_queue' %}">Take a queue</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Your Booked Appointments</h6>
+                    <a href="{% url 'appointments:my_appointments' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if user_appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Service Type</th>
+                                    <th>Appointment Date</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Booked</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in user_appointments %}
+                                    <tr>
+                                        <td><strong>{{ appointment.service_type }}</strong></td>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
+                                        <td>
+                                            <span class="badge {% if appointment.is_senior_citizen %}bg-danger{% elif appointment.is_pwd %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                                {{ appointment.get_priority_label }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if appointment.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">Pending Approval</span>
+                                            {% elif appointment.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif appointment.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif appointment.status == 'completed' %}
+                                                <span class="badge bg-info">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><small class="text-muted">{{ appointment.created_at|date:"M d, Y" }}</small></td>
+                                        <td>
+                                            <a href="{% url 'appointments:detail' appointment.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No upcoming appointments. <a href="{% url 'appointments:book' %}">Book an appointment</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

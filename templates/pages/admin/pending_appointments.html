@@ -1,0 +1,49 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Pending Appointments - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Pending Appointment Approvals</h5>
+            </div>
+            <div class="card-body">
+                {% if appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User</th>
+                                    <th>Service</th>
+                                    <th>Appointment Date</th>
+                                    <th>Purpose</th>
+                                    <th>Requested On</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                    <tr>
+                                        <td><strong>{{ appointment.user.get_full_name }}</strong></td>
+                                        <td>{{ appointment.service_type }}</td>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y" }} {{ appointment.appointment_date|time:"H:i" }}</td>
+                                        <td>{{ appointment.purpose|truncatewords:5 }}</td>
+                                        <td>{{ appointment.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'admin_management:manage_appointment' appointment.id %}" class="btn btn-sm btn-primary">Review</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No pending appointments.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

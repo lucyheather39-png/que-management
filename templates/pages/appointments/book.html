@@ -1,0 +1,87 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Book Appointment - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">Book Appointment</h3>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="id_appointment_date" class="form-label">Appointment Date & Time</label>
+                        {{ form.appointment_date }}
+                        {% if form.appointment_date.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.appointment_date.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_service_type" class="form-label">Service Type</label>
+                        {{ form.service_type }}
+                        {% if form.service_type.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.service_type.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_purpose" class="form-label">Purpose</label>
+                        {{ form.purpose }}
+                        {% if form.purpose.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.purpose.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_notes" class="form-label">Additional Notes (Optional)</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.notes.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Priority:</strong> Your citizen type is <strong>{{ user.profile.get_citizen_type_display }}</strong>
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Book Appointment</button>
+                    <a href="{% url 'queues:dashboard' %}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

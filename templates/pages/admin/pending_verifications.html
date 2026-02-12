@@ -1,0 +1,99 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Pending Verifications - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold">Pending User Verifications</h4>
+            {% if verifications or unverified_users %}
+            <form method="post" action="{% url 'admin_management:approve_all_pending_verifications' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to approve all pending verifications?')">
+                    <i class="bi bi-check-circle"></i> Approve All
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Total Pending: <span class="badge bg-warning">{{ verifications.count|add:unverified_users.count }}</span></h5>
+            </div>
+            <div class="card-body">
+                {% if verifications or unverified_users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Citizen Type</th>
+                                    <th>Requested</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Explicit Verification Requests -->
+                                {% for verification in verifications %}
+                                    <tr>
+                                        <td><strong>{{ verification.user.get_full_name }}</strong></td>
+                                        <td>{{ verification.user.email }}</td>
+                                        <td>{{ verification.user.profile.get_citizen_type_display }}</td>
+                                        <td>{{ verification.created_at|date:"M d, Y" }}</td>
+                                        <td><span class="badge bg-warning">Pending Review</span></td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'admin_management:approve_verification' verification.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="bi bi-eye"></i> Review
+                                                </a>
+                                                <form method="post" action="{% url 'admin_management:approve_single_verification' verification.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Quick approve this user?')">
+                                                        <i class="bi bi-check-circle"></i> Quick Approve
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                
+                                <!-- Unverified Users (without explicit VerificationRequest) -->
+                                {% for user in unverified_users %}
+                                    {% if user.id not in verification_ids %}
+                                    <tr style="background-color: #f9f5f0;">
+                                        <td><strong>{{ user.get_full_name }}</strong></td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.profile.get_citizen_type_display }}</td>
+                                        <td>{{ user.profile.updated_at|date:"M d, Y" }}</td>
+                                        <td><span class="badge bg-secondary">Pending Verification</span></td>
+                                        <td>
+                                            <form method="post" action="{% url 'admin_management:verify_user_profile' user.profile.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approve this user?')">
+                                                    <i class="bi bi-check-circle"></i> Approve
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> No pending verifications. All users have been verified!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

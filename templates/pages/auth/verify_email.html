@@ -1,0 +1,43 @@
+{% extends 'layouts/auth_base.html' %}
+
+{% block title %}Verify Email - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-2">Verify Email Address</h3>
+                <p class="text-center text-muted small mb-4">Enter the 6-digit verification code sent to<br><strong>{{ email }}</strong></p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="verification_code" class="form-label">Verification Code</label>
+                        <input type="text" class="form-control form-control-lg text-center" id="verification_code" name="verification_code" placeholder="000000" maxlength="6" required pattern="[0-9]{6}">
+                        <small class="text-muted">Enter the 6-digit code</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Verify Code</button>
+                </form>
+                
+                <hr class="my-3">
+                
+                <p class="text-center small text-muted">
+                    Didn't receive the code? <a href="{% url 'security:forgot_password' %}">Try again</a>
+                </p>
+                <p class="text-center small">
+                    <a href="{% url 'security:login' %}">Back to login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control-lg {
+    font-size: 1.5rem;
+    letter-spacing: 0.5rem;
+}
+</style>
+{% endblock %}

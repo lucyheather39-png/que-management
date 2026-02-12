@@ -1,0 +1,57 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Queue History - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Queue History</h5>
+            </div>
+            <div class="card-body">
+                {% if queues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Queue Number</th>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for queue in queues %}
+                                    <tr>
+                                        <td><strong>{{ queue.queue_number }}</strong></td>
+                                        <td>{{ queue.service.name }}</td>
+                                        <td>{{ queue.date }} {{ queue.created_at|time:"H:i" }}</td>
+                                        <td>
+                                            {% if queue.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif queue.status == 'cancelled' %}
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge bg-info">{{ queue.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ queue.priority_label }}</td>
+                                        <td>
+                                            <a href="{% url 'queues:queue_detail' queue.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No queue history.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

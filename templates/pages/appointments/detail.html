@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Appointment Details - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Appointment Details</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <strong>Date & Time:</strong><br>
+                        <p>{{ appointment.appointment_date|date:"F d, Y" }} at {{ appointment.appointment_date|time:"H:i" }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Service Type:</strong><br>
+                        <p>{{ appointment.service_type }}</p>
+                    </div>
+                    <div class="col-6">
+                        <strong>Priority:</strong><br>
+                        <p>{{ appointment.get_priority_label }}</p>
+                    </div>
+                    <div class="col-6">
+                        <strong>Status:</strong><br>
+                        {% if appointment.status == 'pending' %}
+                            <span class="badge bg-warning" style="font-size: 0.9em;">Pending Approval</span>
+                        {% elif appointment.status == 'approved' %}
+                            <span class="badge bg-success" style="font-size: 0.9em;">Approved</span>
+                        {% elif appointment.status == 'rejected' %}
+                            <span class="badge bg-danger" style="font-size: 0.9em;">Rejected</span>
+                        {% elif appointment.status == 'completed' %}
+                            <span class="badge bg-info" style="font-size: 0.9em;">Completed</span>
+                        {% else %}
+                            <span class="badge bg-dark" style="font-size: 0.9em;">Cancelled</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <strong>Purpose:</strong><br>
+                        <p>{{ appointment.purpose }}</p>
+                    </div>
+                    {% if appointment.notes %}
+                        <div class="col-12">
+                            <strong>Notes:</strong><br>
+                            <p>{{ appointment.notes }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'appointments:my_appointments' %}" class="btn btn-outline-primary">Back to List</a>
+                    {% if appointment.status == 'pending' or appointment.status == 'approved' %}
+                        <a href="{% url 'appointments:cancel' appointment.id %}" class="btn btn-outline-danger" onclick="return confirm('Cancel appointment?')">Cancel Appointment</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

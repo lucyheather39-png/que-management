@@ -1,0 +1,53 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Delete Service - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-4">
+    <div class="col-12">
+        <h4 class="fw-bold">Delete Service</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 offset-lg-3">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Confirm Deletion
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">
+                    Are you sure you want to delete the service <strong>{{ service.name }}</strong>?
+                </p>
+                
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> This action cannot be undone. All associated data will be deleted.
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Service Details:</strong>
+                    <ul class="mb-0">
+                        <li>Code: <code>{{ service.code }}</code></li>
+                        <li>Type: {{ service.get_service_type_display }}</li>
+                        <li>Active Queues: {{ service.queues.count }}</li>
+                    </ul>
+                </div>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Yes, Delete Service
+                        </button>
+                        <a href="{% url 'queues:service_list' %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Manage Appointment - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">Appointment Management</h3>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <strong>User:</strong><br>
+                        <p>{{ appointment.user.get_full_name }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Service:</strong><br>
+                        <p>{{ appointment.service_type }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Date & Time:</strong><br>
+                        <p>{{ appointment.appointment_date|date:"F d, Y" }} at {{ appointment.appointment_date|time:"H:i" }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Purpose:</strong><br>
+                        <p>{{ appointment.purpose }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Notes:</strong><br>
+                        <p>{{ appointment.notes|default:"No additional notes" }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_status" class="form-label">Decision</label>
+                        <select name="status" class="form-control" required>
+                            <option value="">-- Select --</option>
+                            <option value="approved">Approve</option>
+                            <option value="rejected">Reject</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                    <a href="{% url 'admin_management:pending_appointments' %}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

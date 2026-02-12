@@ -1,0 +1,63 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Admin Dashboard - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-4">
+    <div class="col">
+        <h2 class="fw-bold">Admin Dashboard</h2>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Pending Verifications</h6>
+                <h2 class="text-primary fw-bold">{{ pending_verifications }}</h2>
+                <a href="{% url 'admin_management:pending_verifications' %}" class="btn btn-sm btn-primary mt-2">Review</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Pending Appointments</h6>
+                <h2 class="text-success fw-bold">{{ pending_appointments }}</h2>
+                <a href="{% url 'admin_management:pending_appointments' %}" class="btn btn-sm btn-success mt-2">Approve</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Total Users</h6>
+                <h2 class="text-info fw-bold">{{ total_users }}</h2>
+                <a href="{% url 'admin_management:users_management' %}" class="btn btn-sm btn-info mt-2">View</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Active Queues</h6>
+                <h2 class="text-warning fw-bold">{{ today_queues }}</h2>
+                <a href="{% url 'admin_management:queue_management' %}" class="btn btn-sm btn-warning mt-2">Manage</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Walk-in Queues</h6>
+                <h2 class="text-secondary fw-bold">{{ active_walkin_queues }}</h2>
+                <a href="{% url 'admin_management:walkin_queues' %}" class="btn btn-sm btn-secondary mt-2">View</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

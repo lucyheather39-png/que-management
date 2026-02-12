@@ -1,0 +1,444 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Queue Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/style-modern.css' %}">
+</head>
+<body>
+    {% include 'components/navbar-home.html' %}
+    
+    <main class="main-content">
+        <div class="container-fluid">
+<!-- Professional Hero Section -->
+<div class="hero-professional py-3">
+    <div class="container">
+        <div class="row align-items-center py-4">
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <p class="badge-text mb-3">Government Service Management</p>
+                    <h1 class="display-4 fw-bold mb-4" style="color: #1a202c; line-height: 1.2;">Your Gateway to Efficient Public Services</h1>
+                    <p class="fs-5 text-secondary mb-5" style="max-width: 600px; line-height: 1.8;">Experience seamless government service management. Book appointments, manage queues, and get served with priority based on your citizen status.</p>
+                    {% if not user.is_authenticated %}
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="{% url 'security:login' %}" class="btn btn-primary btn-lg px-4">Login</a>
+                            <a href="{% url 'security:register' %}" class="btn btn-outline-primary btn-lg px-4">Create Account</a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'queues:dashboard' %}" class="btn btn-primary btn-lg px-4">Go to Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not user.is_authenticated %}
+<!-- Core Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-5" style="color: #1a202c;">Why Choose Q-Sys</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="feature-professional">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-calendar2-check"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Smart Appointments</h5>
+                    <p class="text-muted mb-0">Schedule appointments at your convenience and avoid long queues with our intelligent booking system</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-professional">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Secure & Verified</h5>
+                    <p class="text-muted mb-0">All users are verified by administrators ensuring a secure and trustworthy environment</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-professional">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Fair Priority System</h5>
+                    <p class="text-muted mb-0">Senior citizens and PWDs receive priority in queues for equitable service delivery</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-professional">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Fast & Efficient</h5>
+                    <p class="text-muted mb-0">Streamlined processes reduce waiting time and improve overall service delivery</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Grid -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="fw-bold mb-5" style="color: #1a202c;">Services We Offer</h2>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h6 class="fw-bold">Birth Certificate</h6>
+                    <p class="small text-muted">Official birth documentation and verification</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h6 class="fw-bold">Death Certificate</h6>
+                    <p class="small text-muted">Certified death records and documentation</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h6 class="fw-bold">Marriage Certificate</h6>
+                    <p class="small text-muted">Marriage registration and certification</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h6 class="fw-bold">Business Permit</h6>
+                    <p class="small text-muted">Business registration and permit issuance</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-house"></i>
+                    </div>
+                    <h6 class="fw-bold">Property Assessment</h6>
+                    <p class="small text-muted">Property valuation and tax assessment</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="bi bi-question-circle"></i>
+                    </div>
+                    <h6 class="fw-bold">General Inquiry</h6>
+                    <p class="small text-muted">General information and assistance</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-5" style="color: #1a202c;">How It Works</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="process-step">
+                    <div class="step-counter">1</div>
+                    <h5 class="fw-bold mt-4 mb-2">Register & Verify</h5>
+                    <p class="text-muted">Create your account with your details and wait for admin verification</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="process-step">
+                    <div class="step-counter">2</div>
+                    <h5 class="fw-bold mt-4 mb-2">Select Service</h5>
+                    <p class="text-muted">Choose the government service you need from our available options</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="process-step">
+                    <div class="step-counter">3</div>
+                    <h5 class="fw-bold mt-4 mb-2">Get Served</h5>
+                    <p class="text-muted">Attend your appointment or join the queue with your priority level</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3 text-white">Ready to experience efficient service?</h2>
+                <p class="lead text-white-50 mb-0">Join our community and simplify your government service needs</p>
+            </div>
+            <div class="col-lg-4 text-lg-end text-start mt-4 mt-lg-0">
+                <a href="{% url 'security:register' %}" class="btn btn-light btn-lg px-5">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% else %}
+<!-- Dashboard Quick Links -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-5" style="color: #1a202c;">Welcome Back</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <a href="{% url 'queues:take_queue' %}" class="text-decoration-none">
+                    <div class="dashboard-quick-link">
+                        <div class="quick-link-content">
+                            <i class="bi bi-queue-front"></i>
+                            <h4 class="fw-bold">Take a Queue</h4>
+                            <p class="mb-0">Join the queue for immediate service</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'appointments:book' %}" class="text-decoration-none">
+                    <div class="dashboard-quick-link">
+                        <div class="quick-link-content">
+                            <i class="bi bi-calendar2-check"></i>
+                            <h4 class="fw-bold">Book Appointment</h4>
+                            <p class="mb-0">Schedule for a convenient time</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+/* Professional Color Scheme */
+:root {
+    --primary: #0d6efd;
+    --primary-dark: #0b5ed7;
+    --text-dark: #1a202c;
+    --text-muted: #718096;
+    --bg-light: #f7fafc;
+    --border: #e2e8f0;
+}
+
+/* Hero Section */
+.hero-professional {
+    background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+    border-bottom: 1px solid var(--border);
+}
+
+.badge-text {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+}
+
+/* Stats */
+.stat-item {
+    padding: 2rem 1rem;
+}
+
+/* Features */
+.feature-professional {
+    padding: 2rem;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-professional:hover {
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(13, 110, 253, 0.1);
+    transform: translateY(-4px);
+}
+
+.feature-icon-box {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #e7f5ff 0%, #e0f4ff 100%);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+/* Service Cards */
+.service-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.service-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.08);
+    transform: translateY(-2px);
+}
+
+.service-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+/* Process Steps */
+.process-step {
+    position: relative;
+    padding: 2rem;
+    text-align: center;
+}
+
+.step-counter {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary) 0%, #0dcaf0 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary) 0%, #0dcaf0 100%);
+    border-radius: 16px;
+    margin: 3rem 0;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Dashboard Quick Links */
+.dashboard-quick-link {
+    background: linear-gradient(135deg, var(--primary) 0%, #0dcaf0 100%);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    color: white;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.dashboard-quick-link:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(13, 110, 253, 0.2);
+}
+
+.quick-link-content {
+    text-align: center;
+}
+
+.quick-link-content i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.quick-link-content h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.quick-link-content p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: var(--primary);
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.btn-outline-primary:hover {
+    background: #f0f6ff;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-dark);
+}
+
+.text-secondary {
+    color: var(--text-muted) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .btn-lg {
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+</style>
+
+        </div>
+    </main>
+    
+    {% include 'components/footer.html' %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

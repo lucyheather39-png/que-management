@@ -1,0 +1,69 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Queue Details - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Queue Details</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h2 class="display-5 fw-bold">{{ queue.queue_number }}</h2>
+                    <p class="text-muted">Your Queue Number</p>
+                </div>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <strong>Service:</strong><br>
+                        <p>{{ queue.service.name }}</p>
+                    </div>
+                    <div class="col-6">
+                        <strong>Status:</strong><br>
+                        {% if queue.status == 'waiting' %}
+                            <span class="badge bg-info" style="font-size: 0.9em;">Waiting</span>
+                        {% elif queue.status == 'serving' %}
+                            <span class="badge bg-primary" style="font-size: 0.9em;">Being Served</span>
+                        {% elif queue.status == 'completed' %}
+                            <span class="badge bg-success" style="font-size: 0.9em;">Completed</span>
+                        {% else %}
+                            <span class="badge bg-danger" style="font-size: 0.9em;">{{ queue.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-6">
+                        <strong>Priority:</strong><br>
+                        {% if queue.priority_level == 1 %}
+                            <span class="badge bg-danger" style="font-size: 0.9em;">Senior Citizen</span>
+                        {% elif queue.priority_level == 2 %}
+                            <span class="badge bg-warning" style="font-size: 0.9em;">PWD</span>
+                        {% else %}
+                            <span class="badge bg-secondary" style="font-size: 0.9em;">Regular</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-6">
+                        <strong>Position:</strong><br>
+                        <p class="mb-0">#{{ queue.position_in_queue }}</p>
+                    </div>
+                    <div class="col-6">
+                        <strong>Time:</strong><br>
+                        <p class="mb-0">{{ queue.created_at|time:"H:i" }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="alert alert-primary">
+                    <small>
+                        <i class="bi bi-info-circle"></i>
+                        Estimated service time: <strong>{{ queue.service.estimated_time }} minutes</strong>
+                    </small>
+                </div>
+                
+                <a href="{% url 'queues:dashboard' %}" class="btn btn-outline-primary w-100">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

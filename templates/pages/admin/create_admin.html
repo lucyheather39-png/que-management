@@ -1,0 +1,192 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Create Admin Account - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-4">
+    <div class="col">
+        <h2 class="fw-bold">Admin Account Management</h2>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Create Admin Form -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light border-bottom">
+                <h6 class="mb-0">
+                    <i class="bi bi-person-plus"></i> Create New Admin Account
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Username <span class="text-danger">*</span></label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <small class="text-danger d-block mt-1">{{ form.username.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <small class="text-danger d-block mt-1">{{ form.email.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Password <span class="text-danger">*</span></label>
+                        {{ form.password }}
+                        <small class="text-muted d-block mt-1">{{ form.password.help_text }}</small>
+                        {% if form.password.errors %}
+                            <small class="text-danger d-block mt-1">{{ form.password.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password_confirm" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        {{ form.password_confirm }}
+                        {% if form.password_confirm.errors %}
+                            <small class="text-danger d-block mt-1">{{ form.password_confirm.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mb-3">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-circle"></i> Create Admin Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Existing Admins List -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light border-bottom">
+                <h6 class="mb-0">
+                    <i class="bi bi-shield-lock"></i> Current Admin Accounts ({{ admins.count }})
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if admins %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for admin in admins %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ admin.username }}</strong>
+                                            {% if admin == request.user %}
+                                                <span class="badge bg-primary ms-2">You</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ admin.email }}</small>
+                                        </td>
+                                        <td>{{ admin.get_full_name|default:"-" }}</td>
+                                        <td>
+                                            {% if admin.profile.is_verified %}
+                                                <span class="badge bg-success">Verified</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ admin.date_joined|date:"M d, Y" }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                {% if admin.profile %}
+                                                    {% if admin.profile.is_verified %}
+                                                        <form method="post" action="{% url 'admin_management:unverify_user_profile' admin.profile.id %}" style="display: inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Remove verification?')">
+                                                                <i class="bi bi-x-circle"></i>
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <form method="post" action="{% url 'admin_management:verify_user_profile' admin.profile.id %}" style="display: inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Verify this admin?')">
+                                                                <i class="bi bi-check-circle"></i>
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                {% endif %}
+                                                {% if admin != request.user %}
+                                                    <a href="{% url 'admin_management:delete_admin' admin.id %}" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> No admin accounts found.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Info Card -->
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-body">
+                <div class="alert alert-warning mb-0">
+                    <h6 class="alert-heading mb-2">
+                        <i class="bi bi-exclamation-triangle"></i> Important
+                    </h6>
+                    <small>
+                        Only create admin accounts for trusted personnel. Admin accounts have full access to the system. Each admin creation is logged for security purposes.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_username, #id_email, #id_first_name, #id_last_name, #id_password, #id_password_confirm {
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}

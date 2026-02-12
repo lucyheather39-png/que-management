@@ -1,0 +1,132 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Walk-in Queues - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Walk-in Queues Management</h4>
+            <div class="btn-group">
+                <a href="{% url 'public_walkin_queue' %}" class="btn btn-primary" target="_blank">
+                    <i class="bi bi-box-arrow-up-right"></i> View Public Page
+                </a>
+                <button class="btn btn-danger" onclick="resetQueues()">
+                    <i class="bi bi-arrow-clockwise"></i> Reset Queues
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Active Walk-in Queues</h5>
+            </div>
+            <div class="card-body">
+                {% if queues %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Queue #</th>
+                                    <th>Service</th>
+                                    <th>Created At</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for queue in queues %}
+                                    <tr>
+                                        <td><strong>{{ queue.queue_number }}</strong></td>
+                                        <td>{{ queue.service.name }}</td>
+                                        <td>{{ queue.created_at|date:"M d, Y H:i" }}</td>
+                                        <td>
+                                            {% if queue.status == 'waiting' %}
+                                                <span class="badge bg-info">Waiting</span>
+                                            {% elif queue.status == 'serving' %}
+                                                <span class="badge bg-primary">Serving</span>
+                                            {% elif queue.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ queue.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2 align-items-center">
+                                                <form method="post" action="{% url 'admin_management:update_queue_status' queue.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                        <option value="{{ queue.status }}">{{ queue.get_status_display }}</option>
+                                                        <option value="waiting">Waiting</option>
+                                                        <option value="serving">Serving</option>
+                                                        <option value="completed">Completed</option>
+                                                        <option value="cancelled">Cancelled</option>
+                                                    </select>
+                                                </form>
+                                                <form method="post" action="{% url 'admin_management:delete_queue' queue.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No walk-in queues at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-refresh every 3 seconds
+    setInterval(function() {
+        location.reload();
+    }, 3000);
+
+    function resetQueues() {
+        if (confirm('This will delete all walk-in queues and reset the counter to W-001. Continue?')) {
+            fetch('{% url "admin_management:reset_walkin_queues" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Walk-in queues reset successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
+            });
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

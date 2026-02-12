@@ -1,0 +1,84 @@
+{% extends 'layouts/auth_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4">Create Account</h3>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {{ user_form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {{ user_form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Username</label>
+                        {{ user_form.username }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        {{ user_form.email }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">Password</label>
+                        {{ user_form.password1 }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">Confirm Password</label>
+                        {{ user_form.password2 }}
+                    </div>
+                    
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Citizen Type</h6>
+                            {{ profile_form.citizen_type }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_contact_number" class="form-label">Contact Number</label>
+                        {{ profile_form.contact_number }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_id_number" class="form-label">ID Number</label>
+                        {{ profile_form.id_number }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+                
+                <hr class="my-3">
+                
+                <p class="text-center small">
+                    Already have an account? <a href="{% url 'security:login' %}">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_password1, #id_password2, #id_username, #id_email,
+    #id_first_name, #id_last_name, #id_contact_number,
+    #id_id_number, #id_citizen_type {
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}

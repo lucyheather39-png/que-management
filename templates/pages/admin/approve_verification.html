@@ -1,0 +1,57 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Approve Verification - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">Verification Review</h3>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <strong>User:</strong><br>
+                        <p>{{ verification.user.get_full_name }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Email:</strong><br>
+                        <p>{{ verification.user.email }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>ID Number:</strong><br>
+                        <p>{{ verification.user.profile.id_number }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Citizen Type:</strong><br>
+                        <p>{{ verification.user.profile.get_citizen_type_display }}</p>
+                    </div>
+                    <div class="col-12">
+                        <strong>Reason:</strong><br>
+                        <p>{{ verification.reason }}</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_status" class="form-label">Decision</label>
+                        {{ form.status }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_comments" class="form-label">Comments</label>
+                        {{ form.comments }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Submit Decision</button>
+                    <a href="{% url 'admin_management:pending_verifications' %}" class="btn btn-outline-secondary w-100 mt-2">Back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

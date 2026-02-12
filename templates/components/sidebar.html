@@ -1,0 +1,140 @@
+<aside class="sidebar" id="sidebar">
+    <!-- Sidebar Logo/Brand -->
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-text" style="font-size: 24px; font-weight: bold; color: #0d6efd;">Q-Sys</div>
+    </div>
+
+    {% if user.is_authenticated %}
+        {% if user.is_staff and user.is_superuser %}
+            <!-- ADMIN NAVIGATION -->
+            <nav class="sidebar-nav">
+                <!-- Dashboard Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="{% url 'admin_management:dashboard' %}" class="nav-link {% if request.resolver_match.name == 'dashboard' %}active{% endif %}" title="Dashboard overview">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Management Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="{% url 'admin_management:pending_verifications' %}" class="nav-link {% if 'pending_verifications' in request.resolver_match.name %}active{% endif %}" title="Review user verifications">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Verify Users</span>
+                    </a>
+                    <a href="{% url 'admin_management:pending_appointments' %}" class="nav-link {% if 'pending_appointments' in request.resolver_match.name or 'manage_appointment' in request.resolver_match.name %}active{% endif %}" title="Manage appointments">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Manage Appointments</span>
+                    </a>
+                    <a href="{% url 'admin_management:queue_management' %}" class="nav-link {% if 'queue_management' in request.resolver_match.name %}active{% endif %}" title="Configure queues">
+                        <i class="bi bi-list-task"></i>
+                        <span>Queue Config</span>
+                    </a>
+                    <a href="{% url 'admin_management:walkin_queues' %}" class="nav-link {% if 'walkin_queues' in request.resolver_match.name %}active{% endif %}" title="View walk-in queues">
+                        <i class="bi bi-person-walking"></i>
+                        <span>Walk-in Queues</span>
+                    </a>
+                    <a href="{% url 'queues:service_list' %}" class="nav-link {% if 'service_list' in request.resolver_match.name or 'add_service' in request.resolver_match.name or 'edit_service' in request.resolver_match.name %}active{% endif %}" title="Manage services">
+                        <i class="bi bi-sliders"></i>
+                        <span>Services</span>
+                    </a>
+                    <a href="{% url 'admin_management:users_management' %}" class="nav-link {% if 'users_management' in request.resolver_match.name %}active{% endif %}" title="Manage users">
+                        <i class="bi bi-people"></i>
+                        <span>Users</span>
+                    </a>
+                </div>
+
+                <!-- Administration Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Administration</div>
+                    <a href="{% url 'admin_management:create_admin' %}" class="nav-link {% if 'create_admin' in request.resolver_match.name %}active{% endif %}" title="Manage admin accounts">
+                        <i class="bi bi-shield-lock"></i>
+                        <span>Admin Accounts</span>
+                    </a>
+                    <a href="{% url 'admin_management:logs' %}" class="nav-link {% if 'logs' in request.resolver_match.name %}active{% endif %}" title="System activity logs">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Activity Logs</span>
+                    </a>
+                </div>
+            </nav>
+        {% else %}
+            <!-- USER NAVIGATION -->
+            <nav class="sidebar-nav">
+                <!-- Main Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="{% url 'queues:dashboard' %}" class="nav-link {% if 'queues:dashboard' in request.resolver_match.name %}active{% endif %}" title="Your dashboard">
+                        <i class="bi bi-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <!-- Services Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">Services</div>
+                    <a href="{% url 'queues:take_queue' %}" class="nav-link {% if 'take_queue' in request.resolver_match.name %}active{% endif %}" title="Join a queue">
+                        <i class="bi bi-ticket"></i>
+                        <span>Take Queue</span>
+                    </a>
+                    <a href="{% url 'appointments:book' %}" class="nav-link {% if 'appointments:book' in request.resolver_match.name %}active{% endif %}" title="Book an appointment">
+                        <i class="bi bi-calendar-plus"></i>
+                        <span>Book Appointment</span>
+                    </a>
+                    <a href="{% url 'appointments:my_appointments' %}" class="nav-link {% if 'my_appointments' in request.resolver_match.name %}active{% endif %}" title="Your appointments">
+                        <i class="bi bi-calendar2-check"></i>
+                        <span>My Appointments</span>
+                    </a>
+                </div>
+            </nav>
+        {% endif %}
+
+        <!-- Spacer to push footer down -->
+        <div class="sidebar-spacer"></div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <a href="{% url 'security:profile' %}" class="nav-link {% if 'profile' in request.resolver_match.name %}active{% endif %}" title="Profile settings">
+                <i class="bi bi-person"></i>
+                <span>Profile</span>
+            </a>
+            <a href="{% url 'security:logout' %}" class="nav-link text-danger" title="Sign out">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    {% else %}
+        <!-- GUEST/UNAUTHENTICATED NAVIGATION -->
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Authentication</div>
+                <a href="{% url 'security:login' %}" class="nav-link" title="Sign in to your account">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Login</span>
+                </a>
+                <a href="{% url 'security:register' %}" class="nav-link" title="Create a new account">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Register</span>
+                </a>
+            </div>
+        </nav>
+    {% endif %}
+</aside>
+
+<script>
+    // Sidebar collapse/expand on hover with improved behavior
+    const sidebar = document.getElementById('sidebar');
+    let collapseTimeout;
+
+    sidebar.addEventListener('mouseenter', function() {
+        clearTimeout(collapseTimeout);
+        sidebar.classList.add('expanded');
+    });
+
+    sidebar.addEventListener('mouseleave', function() {
+        collapseTimeout = setTimeout(() => {
+            sidebar.classList.remove('expanded');
+        }, 500);
+    });
+</script>

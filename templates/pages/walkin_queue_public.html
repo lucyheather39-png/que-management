@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walk-In Queue Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .container-main {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .header .btn-light {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .header .btn-light:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .card-container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .current-queue-display {
+            margin-bottom: 40px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-selection {
+            margin-bottom: 40px;
+        }
+
+        .service-select {
+            font-size: 1.1rem;
+            padding: 12px 15px;
+            border: 2px solid #ff6a00;
+            border-radius: 8px;
+            background-color: white;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .service-select:focus {
+            outline: none;
+            border-color: #ff8533;
+            box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.1);
+        }
+
+        .service-select option {
+            padding: 10px;
+            color: #333;
+        }
+
+        .queue-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .queue-number {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ff6a00;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 10px;
+        }
+
+        .queue-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-top: 2px solid #eee;
+            border-bottom: 2px solid #eee;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-take-queue {
+            background: linear-gradient(135deg, #ff6a00 0%, #ff8533 100%);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 18px 60px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 106, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-take-queue:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 106, 0, 0.6);
+            background: linear-gradient(135deg, #ff7a1a 0%, #ff9547 100%);
+        }
+
+        .btn-take-queue:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-reset {
+            background: #dc3545;
+            border: none;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-reset:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Queue List Styles */
+        .queues-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .queues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .queue-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f0f0 100%);
+            border: 2px solid #ff6a00;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .queue-card:hover {
+            box-shadow: 0 5px 15px rgba(255, 106, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .queue-card-number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ff6a00;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .queue-card-service {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .queue-card-time {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .queue-card-status {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Scrollbar Styling */
+        .queues-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .queues-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .queues-grid::-webkit-scrollbar-thumb {
+            background: #ff6a00;
+            border-radius: 10px;
+        }
+
+        .queues-grid::-webkit-scrollbar-thumb:hover {
+            background: #ff8533;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .queue-number {
+                font-size: 2.5rem;
+                letter-spacing: 5px;
+            }
+
+            .queue-info {
+                gap: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-take-queue {
+                width: 100%;
+            }
+
+            .queue-generator-card {
+                padding: 30px 20px;
+            }
+
+            .queues-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        /* Loading State */
+        .btn-take-queue.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .btn-take-queue.loading::after {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-left: 10px;
+            border: 2px solid white;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="bi bi-ticket-perforated"></i> Walk-In Queue Management</h1>
+            <p>Click the button below to take your queue number</p>
+            <a href="{% url 'admin_management:dashboard' %}" class="btn btn-light btn-sm mt-3" style="margin-top: 15px !important;">
+                <i class="bi bi-house-door"></i> Go to Dashboard
+            </a>
+        </div>
+
+        <!-- Queue Generator Card -->
+        <div class="queue-generator-card">
+            <div class="success-message" id="successMessage">
+                <i class="bi bi-check-circle"></i> Queue Successfully Created!
+            </div>
+
+            <div class="service-selection" id="serviceSelection">
+                <div class="queue-label">Select Service</div>
+                <select id="serviceSelect" class="form-select service-select" required>
+                    <option value="">-- Choose a Service --</option>
+                    {% for service in services %}
+                        <option value="{{ service.id }}">{{ service.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="current-queue-display" id="currentQueueDisplay" style="display: none;">
+                <div class="queue-label">Your Queue Number</div>
+                <div class="queue-number" id="displayedQueueNumber">-</div>
+                <div class="queue-info">
+                    <div class="info-item">
+                        <div class="info-label">Date</div>
+                        <div class="info-value" id="queueDate">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Time</div>
+                        <div class="info-value" id="queueTime">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Service</div>
+                        <div class="info-value" id="queueService">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-take-queue" id="takeQueueBtn" onclick="takeQueue()">
+                    <i class="bi bi-plus-circle"></i> Take Queue
+                </button>
+            </div>
+        </div>
+
+        <!-- Queue List Section -->
+        <div class="queues-section">
+            <div class="section-title">
+                <i class="bi bi-clock-history"></i> Recent Queues
+            </div>
+            <div class="queues-grid" id="queuesGrid">
+                {% if queues %}
+                    {% for queue in queues %}
+                        <div class="queue-card">
+                            <div class="queue-card-number">{{ queue.queue_number }}</div>
+                            <div class="queue-card-service">{{ queue.service.name }}</div>
+                            <div class="queue-card-time">{{ queue.created_at|date:"M d, Y H:i" }}</div>
+                            <div class="queue-card-status">{{ queue.status|upper }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <i class="bi bi-inbox"></i>
+                        <p>No queues yet. Take one to get started!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Notification sound
+        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj==');
+        // Auto-refresh Recent Queues
+        let currentQueuesMap = new Map();
+        let refreshInterval;
+
+        function refreshRecentQueues() {
+            fetch('/admin-panel/api/walkin-queues/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const grid = document.getElementById('queuesGrid');
+                    const newQueuesMap = new Map();
+
+                    // Build map of current queue IDs from server
+                    data.queues.forEach(queue => {
+                        newQueuesMap.set(queue.id, queue);
+                    });
+
+                    // Check for deleted queues and new queues
+                    let hasChanges = false;
+                    
+                    // If count changed, we have changes
+                    if (currentQueuesMap.size !== newQueuesMap.size) {
+                        hasChanges = true;
+                    } else {
+                        // Check if any queue IDs are missing
+                        for (let queueId of currentQueuesMap.keys()) {
+                            if (!newQueuesMap.has(queueId)) {
+                                hasChanges = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasChanges) {
+                        // Remove cards for deleted queues
+                        const cards = grid.querySelectorAll('.queue-card');
+                        cards.forEach(card => {
+                            const found = Array.from(newQueuesMap.values()).some(q => 
+                                card.querySelector('.queue-card-number').textContent === q.queue_number
+                            );
+                            if (!found) {
+                                card.remove();
+                            }
+                        });
+
+                        // Add new queues that aren't displayed yet
+                        data.queues.forEach(queue => {
+                            const exists = Array.from(cards).some(card => 
+                                card.querySelector('.queue-card-number').textContent === queue.queue_number
+                            );
+                            if (!exists) {
+                                // Add the new queue to the grid
+                                addQueueToList(queue.queue_number, queue.service, queue.created_at, queue.created_time);
+                            }
+                        });
+
+                        // Remove empty state if queues exist
+                        const emptyState = grid.querySelector('.empty-state');
+                        if (emptyState && newQueuesMap.size > 0) {
+                            emptyState.remove();
+                        }
+                    }
+
+                    currentQueuesMap = newQueuesMap;
+                }
+            })
+            .catch(error => {
+                console.log('Auto-refresh error (this is normal):', error);
+            });
+        }
+
+        // Start auto-refresh when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Build initial map
+            const initialCards = document.querySelectorAll('.queue-card');
+            initialCards.forEach(card => {
+                const queueNum = card.querySelector('.queue-card-number').textContent.trim();
+                currentQueuesMap.set(queueNum, { queue_number: queueNum });
+            });
+
+            // Start polling every 3 seconds
+            refreshInterval = setInterval(refreshRecentQueues, 3000);
+        });
+
+        // Clean up interval when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+        function takeQueue() {
+            const serviceSelect = document.getElementById('serviceSelect');
+            const serviceId = serviceSelect.value;
+
+            if (!serviceId) {
+                alert('Please select a service first');
+                serviceSelect.focus();
+                return;
+            }
+
+            const btn = document.getElementById('takeQueueBtn');
+            btn.classList.add('loading');
+
+            const formData = new FormData();
+            formData.append('service_id', serviceId);
+
+            fetch('{% url "public_walkin_queue" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.classList.remove('loading');
+
+                if (data.success) {
+                    // Show success message
+                    const successMsg = document.getElementById('successMessage');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 4000);
+
+                    // Display queue information
+                    const displayDiv = document.getElementById('currentQueueDisplay');
+                    displayDiv.style.display = 'block';
+                    document.getElementById('displayedQueueNumber').textContent = data.queue_number;
+                    document.getElementById('queueDate').textContent = data.created_at;
+                    document.getElementById('queueTime').textContent = data.created_time;
+                    document.getElementById('queueService').textContent = data.service;
+
+                    // Play notification sound
+                    try {
+                        notificationSound.play();
+                    } catch (e) {
+                        console.log('Sound notification not supported');
+                    }
+
+                    // Add new queue to the list
+                    addQueueToList(data.queue_number, data.service, data.created_at, data.created_time);
+
+                    // Reset service selection for next queue
+                    serviceSelect.value = '';
+                    
+                    // Keep service selection visible for next queue
+                    document.getElementById('serviceSelection').style.display = 'block';
+
+                    // Auto-scroll to newest queue
+                    setTimeout(() => {
+                        const grid = document.getElementById('queuesGrid');
+                        grid.scrollLeft = 0;
+                    }, 100);
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to create queue'));
+                }
+            })
+            .catch(error => {
+                btn.classList.remove('loading');
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function addQueueToList(queueNumber, service, date, time) {
+            const grid = document.getElementById('queuesGrid');
+            const emptyState = grid.querySelector('.empty-state');
+            
+            // Remove empty state if it exists
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const queueCard = document.createElement('div');
+            queueCard.className = 'queue-card';
+            queueCard.innerHTML = `
+                <div class="queue-card-number">${queueNumber}</div>
+                <div class="queue-card-service">${service}</div>
+                <div class="queue-card-time">${date} ${time}</div>
+                <div class="queue-card-status">WAITING</div>
+            `;
+
+            // Insert at the beginning
+            grid.insertBefore(queueCard, grid.firstChild);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Print queue slip functionality
+        function printQueue() {
+            const queueNumber = document.getElementById('displayedQueueNumber').textContent;
+            const queueService = document.getElementById('queueService').textContent;
+            const queueDate = document.getElementById('queueDate').textContent;
+            const queueTime = document.getElementById('queueTime').textContent;
+
+            if (queueNumber === '-') {
+                alert('Please take a queue first');
+                return;
+            }
+
+            const printContent = `
+                <html>
+                <head>
+                    <title>Queue Slip</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; }
+                        .slip { max-width: 400px; margin: 50px auto; padding: 30px; border: 2px solid #ff6a00; }
+                        .number { font-size: 4rem; font-weight: bold; color: #ff6a00; margin: 20px 0; }
+                        .info { font-size: 1.2rem; margin: 10px 0; }
+                        .label { font-weight: bold; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="slip">
+                        <h1>Queue Number</h1>
+                        <div class="number">${queueNumber}</div>
+                        <div class="info"><span class="label">Service:</span> ${queueService}</div>
+                        <div class="info"><span class="label">Date:</span> ${queueDate}</div>
+                        <div class="info"><span class="label">Time:</span> ${queueTime}</div>
+                        <p style="margin-top: 30px; font-size: 0.9rem; color: #999;">Please keep this slip for reference</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const printWindow = window.open('', '', 'height=400,width=600');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
+</body>
+</html>

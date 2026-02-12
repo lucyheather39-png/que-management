@@ -1,0 +1,70 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}My Appointments - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Appointments</h5>
+                    <a href="{% url 'appointments:book' %}" class="btn btn-sm btn-primary">Book New</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if appointments %}
+                    <p class="text-muted small mb-3">Total appointments: <strong>{{ appointments.count }}</strong></p>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Service Type</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Booked</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                    <tr>
+                                        <td><strong>{{ appointment.appointment_date|date:"M d, Y H:i" }}</strong></td>
+                                        <td>{{ appointment.service_type }}</td>
+                                        <td>{{ appointment.get_priority_label }}</td>
+                                        <td>
+                                            {% if appointment.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">Pending Approval</span>
+                                            {% elif appointment.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif appointment.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif appointment.status == 'completed' %}
+                                                <span class="badge bg-info">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><small class="text-muted">{{ appointment.created_at|date:"M d, Y" }}</small></td>
+                                        <td>
+                                            <a href="{% url 'appointments:detail' appointment.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                            {% if appointment.status == 'pending' or appointment.status == 'approved' %}
+                                                <a href="{% url 'appointments:cancel' appointment.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel appointment?')">Cancel</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">You haven't booked any appointments yet. <a href="{% url 'appointments:book' %}">Book your first appointment</a></p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
