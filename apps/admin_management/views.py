@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from functools import wraps
 from apps.accounts.models import UserProfile
 from apps.appointments.models import Appointment
 from apps.queues.models import Queue, Service
@@ -44,8 +45,26 @@ from .user_verification import (
 def is_admin(user):
     return user.is_staff and user.is_superuser
 
-@login_required
-@user_passes_test(is_admin)
+def admin_required(view_func):
+    """
+    Decorator to ensure user is authenticated and is an admin.
+    Properly redirects non-admin authenticated users with an error message.
+    """
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, 'You must be logged in to access this page.')
+            return redirect('security:login')
+        
+        if not is_admin(request.user):
+            messages.error(request, 'You do not have permission to access the admin dashboard. Only administrators can access this area.')
+            return redirect('/queue/dashboard/')
+        
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
+
+@admin_required
 def admin_dashboard_view(request):
     from django.db.models import Q
     # Count all unverified users (both with and without VerificationRequest records)
@@ -71,8 +90,7 @@ def admin_dashboard_view(request):
     }
     return render(request, 'pages/admin/dashboard.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def pending_verifications_view(request):
     # Get all unverified users (not just VerificationRequest records)
     unverified_users = User.objects.filter(
@@ -93,8 +111,7 @@ def pending_verifications_view(request):
     return render(request, 'pages/admin/pending_verifications.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def approve_all_pending_verifications_view(request):
     """Approve all pending verifications at once"""
     if request.method == 'POST':
@@ -112,8 +129,7 @@ def approve_all_pending_verifications_view(request):
     return render(request, 'pages/admin/approve_all_verifications.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def approve_single_verification_view(request, verification_id):
     """Quick approve a single verification"""
     if request.method == 'POST':
@@ -126,8 +142,7 @@ def approve_single_verification_view(request, verification_id):
     
     return redirect('admin_management:pending_verifications')
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def approve_verification_view(request, verification_id):
     verification = get_object_or_404(VerificationRequest, id=verification_id)
     
@@ -157,8 +172,7 @@ def approve_verification_view(request, verification_id):
     }
     return render(request, 'pages/admin/approve_verification.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def pending_appointments_view(request):
     appointments = Appointment.objects.filter(status='pending').order_by('-created_at')
     
@@ -167,8 +181,7 @@ def pending_appointments_view(request):
     }
     return render(request, 'pages/admin/pending_appointments.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def manage_appointment_view(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
     
@@ -193,8 +206,7 @@ def manage_appointment_view(request, appointment_id):
     }
     return render(request, 'pages/admin/manage_appointment.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def queue_management_view(request):
     from django.db.models import Q
     today_queues = Queue.objects.filter(
@@ -206,8 +218,7 @@ def queue_management_view(request):
     }
     return render(request, 'pages/admin/queue_management.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def update_queue_status_view(request, queue_id):
     queue_verification = verify_queue_status(queue_id)
     
@@ -236,8 +247,7 @@ def update_queue_status_view(request, queue_id):
     
     return redirect('admin_management:queue_management')
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def delete_queue_view(request, queue_id):
     queue = get_object_or_404(Queue, id=queue_id)
     
@@ -248,8 +258,7 @@ def delete_queue_view(request, queue_id):
     
     return redirect('admin_management:queue_management')
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def users_management_view(request):
     users = UserProfile.objects.all().order_by('-created_at')
     
@@ -258,8 +267,7 @@ def users_management_view(request):
     }
     return render(request, 'pages/admin/users_management.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def check_account_status_view(request, user_profile_id):
     """Check and display account/verification status for a user"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -280,8 +288,7 @@ def check_account_status_view(request, user_profile_id):
     return render(request, 'pages/admin/check_account_status.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def verify_user_profile_view(request, user_profile_id):
     """Verify a user profile"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -297,8 +304,7 @@ def verify_user_profile_view(request, user_profile_id):
     return redirect('admin_management:check_account_status', user_profile_id=user_profile_id)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def unverify_user_profile_view(request, user_profile_id):
     """Unverify a user profile"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -322,8 +328,7 @@ def unverify_user_profile_view(request, user_profile_id):
     return render(request, 'pages/admin/check_account_status.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def admin_logs_view(request):
     logs = AdminLog.objects.all().order_by('-timestamp')[:100]
     
@@ -332,8 +337,7 @@ def admin_logs_view(request):
     }
     return render(request, 'pages/admin/logs.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def delete_log_view(request, log_id):
     log = get_object_or_404(AdminLog, id=log_id)
     
@@ -343,8 +347,7 @@ def delete_log_view(request, log_id):
     
     return redirect('admin_management:logs')
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def create_admin_view(request):
     admins = User.objects.filter(is_staff=True, is_superuser=True).order_by('-date_joined')
     
@@ -375,8 +378,7 @@ def create_admin_view(request):
     }
     return render(request, 'pages/admin/create_admin.html', context)
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def delete_admin_view(request, admin_id):
     admin_user = get_object_or_404(User, id=admin_id, is_staff=True, is_superuser=True)
     
@@ -408,8 +410,7 @@ def delete_admin_view(request, admin_id):
 
 # Status Verification Views
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def verify_user_status_view(request, user_id):
     """View to verify user's verification status"""
     user = get_object_or_404(User, id=user_id)
@@ -422,8 +423,7 @@ def verify_user_status_view(request, user_id):
     return render(request, 'pages/admin/verify_user_status.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def verify_all_user_statuses_view(request, user_id):
     """View to verify all statuses for a user"""
     from .status_utils import verify_all_user_statuses
@@ -442,8 +442,7 @@ def verify_all_user_statuses_view(request, user_id):
 
 # Profile Verification Views
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def profile_verification_stats_view(request):
     """View profile verification statistics"""
     stats = get_verification_stats()
@@ -456,8 +455,7 @@ def profile_verification_stats_view(request):
     return render(request, 'pages/admin/verification_stats.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def quick_approve_profile_view(request, user_profile_id):
     """Quick approve user profile"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -486,8 +484,7 @@ def quick_approve_profile_view(request, user_profile_id):
     return render(request, 'pages/admin/quick_approve_profile.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def quick_reject_profile_view(request, user_profile_id):
     """Quick reject user profile"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -511,8 +508,7 @@ def quick_reject_profile_view(request, user_profile_id):
     return render(request, 'pages/admin/quick_reject_profile.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def get_profile_verification_status_view(request, user_profile_id):
     """View profile verification status details"""
     user_profile = get_object_or_404(UserProfile, id=user_profile_id)
@@ -529,8 +525,7 @@ def get_profile_verification_status_view(request, user_profile_id):
 
 # User Verification Views
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def user_verification_stats_view(request):
     """View user verification statistics"""
     stats = get_user_verification_stats()
@@ -543,8 +538,7 @@ def user_verification_stats_view(request):
     return render(request, 'pages/admin/user_verification_stats.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def unverified_users_view(request):
     """View all unverified users"""
     data = get_all_unverified_users()
@@ -556,8 +550,7 @@ def unverified_users_view(request):
     return render(request, 'pages/admin/unverified_users.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def verified_users_view(request):
     """View all verified users"""
     data = get_all_verified_users()
@@ -569,8 +562,7 @@ def verified_users_view(request):
     return render(request, 'pages/admin/verified_users.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def inactive_users_view(request):
     """View all inactive users"""
     data = get_all_inactive_users()
@@ -582,8 +574,7 @@ def inactive_users_view(request):
     return render(request, 'pages/admin/inactive_users.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def verify_user_account_view(request, user_id):
     """Verify a user account"""
     user = get_object_or_404(User, id=user_id)
@@ -609,8 +600,7 @@ def verify_user_account_view(request, user_id):
     return render(request, 'pages/admin/verify_user_account.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def deactivate_user_account_view(request, user_id):
     """Deactivate/Unverify a user account"""
     user = get_object_or_404(User, id=user_id)
@@ -637,8 +627,7 @@ def deactivate_user_account_view(request, user_id):
     return render(request, 'pages/admin/deactivate_user_account.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def user_verification_status_view(request, user_id):
     """View detailed user verification status"""
     user = get_object_or_404(User, id=user_id)
@@ -652,8 +641,7 @@ def user_verification_status_view(request, user_id):
     return render(request, 'pages/admin/user_verification_status.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def walkin_queues_view(request):
     """Admin view for managing walk-in queues"""
     walkin_queues = Queue.objects.filter(
@@ -784,8 +772,7 @@ def get_walkin_queues_api(request):
 
 
 @require_http_methods(["POST"])
-@login_required
-@user_passes_test(is_admin)
+@admin_required
 def reset_walkin_queues_view(request):
     """Reset walk-in queue numbers back to W-001 (Admin only)"""
     try:
