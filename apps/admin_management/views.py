@@ -98,43 +98,72 @@ def admin_required(view_func):
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            messages.error(request, 'You must be logged in to access this page.')
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        try:
+            if not request.user.is_authenticated:
+                messages.error(request, 'You must be logged in to access this page.')
+                return redirect('security:login')
+            
+            if not is_admin(request.user):
+                messages.error(request, 'You do not have permission to access the admin dashboard. Only administrators can access this area.')
+                return redirect('/queue/dashboard/')
+            
+            # Call the view function
+            return view_func(request, *args, **kwargs)
+        
+        except Exception as e:
+            logger.exception(f'Admin decorator error for user {request.user.id}: {str(e)}')
+            messages.error(request, 'An unexpected error occurred. Please try again.')
             return redirect('security:login')
-        
-        if not is_admin(request.user):
-            messages.error(request, 'You do not have permission to access the admin dashboard. Only administrators can access this area.')
-            return redirect('/queue/dashboard/')
-        
-        return view_func(request, *args, **kwargs)
     
     return wrapper
 
 @admin_required
 def admin_dashboard_view(request):
-    from django.db.models import Q
-    # Count all unverified users (both with and without VerificationRequest records)
-    pending_verifications = User.objects.filter(profile__is_verified=False).count()
-    pending_appointments = Appointment.objects.filter(status='pending').count()
-    total_users = User.objects.filter(profile__isnull=False).count()
-    # Count active online queues only (exclude walk-in queues)
-    today_queues = Queue.objects.filter(
-        Q(status__in=['waiting', 'serving']) & ~Q(queue_number__startswith='W-')
-    ).count()
-    # Count active walk-in queues
-    active_walkin_queues = Queue.objects.filter(
-        queue_number__startswith='W-',
-        status__in=['waiting', 'serving']
-    ).count()
+    import logging
+    logger = logging.getLogger(__name__)
     
-    context = {
-        'pending_verifications': pending_verifications,
-        'pending_appointments': pending_appointments,
-        'total_users': total_users,
-        'today_queues': today_queues,
-        'active_walkin_queues': active_walkin_queues,
-    }
-    return render(request, 'pages/admin/dashboard.html', context)
+    try:
+        from django.db.models import Q
+        
+        # Count all unverified users (both with and without VerificationRequest records)
+        pending_verifications = User.objects.filter(profile__is_verified=False).count()
+        pending_appointments = Appointment.objects.filter(status='pending').count()
+        total_users = User.objects.filter(profile__isnull=False).count()
+        
+        # Count active online queues only (exclude walk-in queues)
+        today_queues = Queue.objects.filter(
+            Q(status__in=['waiting', 'serving']) & ~Q(queue_number__startswith='W-')
+        ).count()
+        
+        # Count active walk-in queues
+        active_walkin_queues = Queue.objects.filter(
+            queue_number__startswith='W-',
+            status__in=['waiting', 'serving']
+        ).count()
+        
+        context = {
+            'pending_verifications': pending_verifications,
+            'pending_appointments': pending_appointments,
+            'total_users': total_users,
+            'today_queues': today_queues,
+            'active_walkin_queues': active_walkin_queues,
+        }
+        return render(request, 'pages/admin/dashboard.html', context)
+    
+    except Exception as e:
+        logger.exception(f'Admin dashboard view error for user {request.user.id}: {str(e)}')
+        messages.error(request, 'Error loading admin dashboard. Please try again or contact support.')
+        return render(request, 'pages/admin/dashboard.html', {
+            'pending_verifications': 0,
+            'pending_appointments': 0,
+            'total_users': 0,
+            'today_queues': 0,
+            'active_walkin_queues': 0,
+            'error': True,
+        })
 
 @admin_required
 def pending_verifications_view(request):
