@@ -4,15 +4,26 @@ import os
 
 
 class Command(BaseCommand):
-    help = 'Creates a superuser account if it does not exist'
+    help = 'Creates or updates a superuser account'
 
     def handle(self, *args, **options):
         username = os.getenv('ADMIN_USERNAME', 'admin')
         email = os.getenv('ADMIN_EMAIL', 'admin@example.com')
         password = os.getenv('ADMIN_PASSWORD', 'admin123')
 
-        if not User.objects.filter(username=username).exists():
-            User.objects.create_superuser(username, email, password)
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={'email': email, 'is_staff': True, 'is_superuser': True}
+        )
+        
+        # Always update email and set password
+        user.email = email
+        user.set_password(password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        
+        if created:
             self.stdout.write(
                 self.style.SUCCESS(
                     f'Successfully created superuser "{username}"'
@@ -20,7 +31,8 @@ class Command(BaseCommand):
             )
         else:
             self.stdout.write(
-                self.style.WARNING(
-                    f'Superuser "{username}" already exists'
+                self.style.SUCCESS(
+                    f'Successfully updated superuser "{username}" credentials'
                 )
+            )
             )
