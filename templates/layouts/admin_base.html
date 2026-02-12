@@ -38,19 +38,22 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script>
-        // Prevent caching and force fresh page loads on navigation
+        // Aggressive cache-busting for all navigation links
         document.addEventListener('DOMContentLoaded', function() {
-            // Add cache-busting to all internal navigation links
-            document.querySelectorAll('.nav-link').forEach(link => {
+            // Cache-bust all nav links to force fresh page loads
+            document.querySelectorAll('a.nav-link').forEach(link => {
+                const originalHref = link.getAttribute('href');
                 link.addEventListener('click', function(e) {
-                    // Force full page reload with cache bypass
-                    const href = this.getAttribute('href');
-                    if (href && !href.startsWith('http')) {
-                        // Add cache-buster parameter using current timestamp
-                        const separator = href.includes('?') ? '&' : '?';
-                        const newHref = href + separator + '_v=' + Date.now();
+                    if (originalHref && !originalHref.startsWith('http')) {
                         e.preventDefault();
-                        window.location.href = newHref;
+                        e.stopPropagation();
+                        // Add aggressive cache-busting with timestamp + random
+                        const separator = originalHref.includes('?') ? '&' : '?';
+                        const cacheBuster = '_t=' + Date.now() + '_r=' + Math.random();
+                        const newUrl = originalHref + separator + cacheBuster;
+                        // Force full page reload, bypassing all caches
+                        window.location.href = newUrl;
+                        return false;
                     }
                 });
             });
