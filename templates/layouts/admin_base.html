@@ -38,27 +38,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script>
-        // Aggressive cache-busting for all navigation links
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cache-bust all nav links to force fresh page loads
-            document.querySelectorAll('a.nav-link').forEach(link => {
-                const originalHref = link.getAttribute('href');
-                link.addEventListener('click', function(e) {
-                    if (originalHref && !originalHref.startsWith('http')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // Add aggressive cache-busting with timestamp + random
-                        const separator = originalHref.includes('?') ? '&' : '?';
-                        const cacheBuster = '_t=' + Date.now() + '_r=' + Math.random();
-                        const newUrl = originalHref + separator + cacheBuster;
-                        // Force full page reload, bypassing all caches
-                        window.location.href = newUrl;
-                        return false;
-                    }
-                });
-            });
-        });
-
         // Smart Sidebar - Expand on hover, collapse on mouse leave
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');
