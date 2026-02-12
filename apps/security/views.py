@@ -33,7 +33,7 @@ Queue Management System
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('queues:dashboard')
+        return redirect('/queue/dashboard/')  # Changed to direct URL
     
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
@@ -46,7 +46,7 @@ def register_view(request):
             profile.save()
             
             messages.success(request, 'Registration successful! Please login.')
-            return redirect('security:login')
+            return redirect('/auth/login/')  # Changed to direct URL
         else:
             for field, errors in user_form.errors.items():
                 for error in errors:
@@ -67,8 +67,8 @@ def register_view(request):
 def login_view(request):
     if request.user.is_authenticated:
         if request.user.is_staff and request.user.is_superuser:
-            return redirect('admin_management:dashboard')
-        return redirect('queues:dashboard')
+            return redirect('/admin-panel/')  # Changed to direct URL
+        return redirect('/queue/dashboard/')  # Changed to direct URL
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -78,10 +78,11 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
-            # Redirect admin to admin dashboard, regular users to user dashboard
+            
+            # Redirect based on user role
             if user.is_staff and user.is_superuser:
-                return redirect('admin_management:dashboard')
-            return redirect('queues:dashboard')
+                return redirect('/admin-panel/')
+            return redirect('/queue/dashboard/')
         else:
             messages.error(request, 'Invalid username or password.')
     
@@ -91,7 +92,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('home')
+    return redirect('/auth/login/')  # Changed to direct URL
 
 @login_required
 def profile_view(request):
@@ -105,7 +106,7 @@ def profile_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Profile updated successfully!')
-            return redirect('security:profile')
+            return redirect('/auth/profile/')  # Changed to direct URL
     else:
         form = UserProfileForm(instance=profile)
     
