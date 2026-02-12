@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views_setup import setup_admin_view
 
 app_name = 'security'
 
@@ -12,5 +11,4 @@ urlpatterns = [
     path('forgot-password/', views.forgot_password_view, name='forgot_password'),
     path('verify-email/<int:user_id>/', views.verify_email_view, name='verify_email'),
     path('reset-password/<int:user_id>/', views.reset_password_view, name='reset_password'),
-    path('setup-admin/', setup_admin_view, name='setup_admin'),  # Temporary - delete after use
 ]
