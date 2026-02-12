@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>{% block title %}Government Queue & Appointment System{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -32,6 +35,23 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // Prevent caching and force fresh page loads on navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add cache-busting to all internal navigation links
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    // Only apply to internal navigation links (not external or special links)
+                    if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                        // Add cache-buster parameter using current timestamp
+                        const separator = href.includes('?') ? '&' : '?';
+                        this.setAttribute('href', href + separator + '_v=' + Date.now());
+                    }
+                });
+            });
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
