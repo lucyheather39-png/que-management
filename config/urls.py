@@ -4,9 +4,17 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from django.contrib.auth.models import User
 from apps.admin_management.views import public_walkin_queue_view
 
 def redirect_to_dashboard(request):
+    # Check if any admin exists
+    admin_exists = User.objects.filter(is_staff=True, is_superuser=True).exists()
+    
+    if not admin_exists:
+        # No admin - redirect to setup page
+        return HttpResponseRedirect('/admin-panel/setup/')
+    
     if request.user.is_authenticated:
         if request.user.is_staff and request.user.is_superuser:
             return HttpResponseRedirect('/admin-panel/')

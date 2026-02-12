@@ -4,6 +4,9 @@ from . import views
 app_name = 'admin_management'
 
 urlpatterns = [
+    # Public setup - create first admin
+    path('setup/', views.setup_first_admin, name='setup_first_admin'),
+    # Protected admin views
     path('', views.admin_dashboard_view, name='dashboard'),
     path('verifications/pending/', views.pending_verifications_view, name='pending_verifications'),
     path('verifications/pending/approve-all/', views.approve_all_pending_verifications_view, name='approve_all_pending_verifications'),

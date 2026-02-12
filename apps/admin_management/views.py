@@ -45,6 +45,48 @@ from .user_verification import (
 def is_admin(user):
     return user.is_staff and user.is_superuser
 
+def setup_first_admin(request):
+    """
+    Public view to create the first admin account.
+    Only accessible if no admin accounts exist yet.
+    """
+    # Check if any admin exists
+    admin_exists = User.objects.filter(is_staff=True, is_superuser=True).exists()
+    
+    if admin_exists:
+        messages.warning(request, 'Admin account already exists. Please login instead.')
+        return redirect('security:login')
+    
+    if request.method == 'POST':
+        form = AdminCreationForm(request.POST)
+        if form.is_valid():
+            admin_user = form.save()
+            
+            # Create a UserProfile for the admin
+            from apps.accounts.models import UserProfile
+            UserProfile.objects.get_or_create(
+                user=admin_user,
+                defaults={
+                    'citizen_type': 'regular',
+                    'is_verified': True
+                }
+            )
+            
+            messages.success(request, 'Admin account created successfully! You can now login.')
+            return redirect('security:login')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = AdminCreationForm()
+    
+    context = {
+        'form': form,
+        'is_setup': True,
+    }
+    return render(request, 'pages/admin/setup_admin.html', context)
+
 def admin_required(view_func):
     """
     Decorator to ensure user is authenticated and is an admin.

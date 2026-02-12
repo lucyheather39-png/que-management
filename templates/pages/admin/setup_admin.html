@@ -1,0 +1,177 @@
+{% extends 'layouts/auth_base.html' %}
+
+{% block title %}Create Admin Account - Queue Management System Setup{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="w-100" style="max-width: 500px;">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <div class="mb-3">
+                <i class="bi bi-shield-lock text-primary" style="font-size: 3rem;"></i>
+            </div>
+            <h1 class="fw-bold mb-2">Initial Setup</h1>
+            <p class="text-muted mb-0">Create your first administrator account</p>
+        </div>
+
+        <!-- Alert Messages -->
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Setup Form -->
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white border-0">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus"></i> Create Admin Account
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label fw-500">
+                            Username <span class="text-danger">*</span>
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <small class="text-danger d-block mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.username.errors.0 }}
+                            </small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label fw-500">
+                            Email Address <span class="text-danger">*</span>
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <small class="text-danger d-block mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.email.errors.0 }}
+                            </small>
+                        {% endif %}
+                    </div>
+
+                    <!-- First and Last Name -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label for="id_first_name" class="form-label fw-500">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-6">
+                            <label for="id_last_name" class="form-label fw-500">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label fw-500">
+                            Password <span class="text-danger">*</span>
+                        </label>
+                        {{ form.password }}
+                        <small class="text-muted d-block mt-1">
+                            <i class="bi bi-info-circle"></i>
+                            {{ form.password.help_text }}
+                        </small>
+                        {% if form.password.errors %}
+                            <small class="text-danger d-block mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.password.errors.0 }}
+                            </small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-4">
+                        <label for="id_password_confirm" class="form-label fw-500">
+                            Confirm Password <span class="text-danger">*</span>
+                        </label>
+                        {{ form.password_confirm }}
+                        {% if form.password_confirm.errors %}
+                            <small class="text-danger d-block mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.password_confirm.errors.0 }}
+                            </small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Non-field Errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mb-3" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Error:</strong>
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-1">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100 btn-lg fw-600">
+                        <i class="bi bi-check-circle"></i> Create Admin Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="alert alert-info mt-4 border-0" role="alert">
+            <i class="bi bi-info-circle"></i>
+            <strong>Important:</strong> This account will have full administrator access to the Queue Management System.
+            Keep your credentials secure and do not share them.
+        </div>
+
+        <!-- Login Link -->
+        <div class="text-center mt-4">
+            <p class="text-muted">
+                Already have an account?
+                <a href="{% url 'security:login' %}" class="text-primary fw-600">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-vh-100 {
+        min-height: 100vh;
+    }
+    
+    .fw-500 {
+        font-weight: 500;
+    }
+    
+    .fw-600 {
+        font-weight: 600;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .card {
+        border-radius: 0.5rem;
+    }
+</style>
+{% endblock %}
