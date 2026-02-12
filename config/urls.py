@@ -10,7 +10,7 @@ def redirect_to_dashboard(request):
     if request.user.is_authenticated:
         if request.user.is_staff and request.user.is_superuser:
             return HttpResponseRedirect('/admin-panel/')
-        return HttpResponseRedirect('/queue/')
+        return HttpResponseRedirect('/queue/dashboard/')  # Changed from '/queue/'
     return HttpResponseRedirect('/auth/login/')
 
 urlpatterns = [

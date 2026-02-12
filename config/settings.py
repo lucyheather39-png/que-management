@@ -108,7 +108,7 @@ if os.getenv('ENVIRONMENT') == 'production':
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'security:login'
-LOGIN_REDIRECT_URL = 'queues:dashboard'
+LOGIN_REDIRECT_URL = '/queue/dashboard/'
 LOGOUT_REDIRECT_URL = 'security:login'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

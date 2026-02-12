@@ -1,11 +1,9 @@
 from django.urls import path
-from django.views.generic import RedirectView
 from . import views
 
 app_name = 'queues'
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='dashboard/', permanent=False), name='queue_root'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('take/', views.take_queue_view, name='take_queue'),
     path('detail/<int:queue_id>/', views.queue_detail_view, name='queue_detail'),
