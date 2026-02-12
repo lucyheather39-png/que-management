@@ -8,37 +8,40 @@ class Command(BaseCommand):
     help = 'Creates or updates a superuser account'
 
     def handle(self, *args, **options):
-        username = os.getenv('ADMIN_USERNAME', 'admin')
-        email = os.getenv('ADMIN_EMAIL', 'admin@example.com')
-        password = os.getenv('ADMIN_PASSWORD', 'admin123')
+        try:
+            username = os.getenv('ADMIN_USERNAME', 'admin')
+            email = os.getenv('ADMIN_EMAIL', 'admin@example.com')
+            password = os.getenv('ADMIN_PASSWORD', 'admin123')
 
-        user, created = User.objects.get_or_create(
-            username=username,
-            defaults={'email': email, 'is_staff': True, 'is_superuser': True}
-        )
-        
-        # Always update email and set password
-        user.email = email
-        user.set_password(password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save()
-        
-        # Create or update UserProfile for the admin user
-        profile, profile_created = UserProfile.objects.get_or_create(
-            user=user,
-            defaults={'citizen_type': 'regular', 'is_verified': True}
-        )
-        
-        if created:
+            # Delete existing admin if it exists and recreate
+            User.objects.filter(username=username).delete()
+            
+            # Create new superuser
+            user = User.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password
+            )
+            
+            # Create or update UserProfile for the admin user
+            profile, profile_created = UserProfile.objects.get_or_create(
+                user=user,
+                defaults={'citizen_type': 'regular', 'is_verified': True}
+            )
+            
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'Successfully created superuser "{username}"'
+                    f'Successfully created superuser "{username}" with email "{email}"'
                 )
             )
-        else:
             self.stdout.write(
-                self.style.SUCCESS(
-                    f'Successfully updated superuser "{username}" credentials'
+                self.style.WARNING(
+                    f'Admin login: username="{username}", password="{password}"'
+                )
+            )
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(
+                    f'Error creating admin user: {str(e)}'
                 )
             )
