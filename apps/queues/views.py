@@ -9,23 +9,27 @@ from .utils import generate_queue_number, assign_priority, calculate_position
 
 @login_required
 def dashboard_view(request):
-    from apps.appointments.models import Appointment
-    
-    user_queues = Queue.objects.filter(user=request.user, date=timezone.now().date())
-    active_queue = user_queues.filter(status__in=['waiting', 'serving']).first()
-    
-    # Get user's pending and approved appointments
-    user_appointments = Appointment.objects.filter(
-        user=request.user,
-        status__in=['pending', 'approved']
-    ).order_by('-created_at')[:5]
-    
-    context = {
-        'user_queues': user_queues,
-        'active_queue': active_queue,
-        'user_appointments': user_appointments,
-    }
-    return render(request, 'pages/queue/dashboard.html', context)
+    try:
+        from apps.appointments.models import Appointment
+        
+        user_queues = Queue.objects.filter(user=request.user, date=timezone.now().date())
+        active_queue = user_queues.filter(status__in=['waiting', 'serving']).first()
+        
+        # Get user's pending and approved appointments
+        user_appointments = Appointment.objects.filter(
+            user=request.user,
+            status__in=['pending', 'approved']
+        ).order_by('-created_at')[:5]
+        
+        context = {
+            'user_queues': user_queues,
+            'active_queue': active_queue,
+            'user_appointments': user_appointments,
+        }
+        return render(request, 'pages/queue/dashboard.html', context)
+    except Exception as e:
+        messages.error(request, f'Error loading dashboard: {str(e)}')
+        return redirect('security:login')
 
 @login_required
 def take_queue_view(request):
@@ -46,8 +50,12 @@ def take_queue_view(request):
                 return redirect('queues:take_queue')
             
             try:
+                # Ensure user has a profile
+                from apps.accounts.models import UserProfile
+                profile, _ = UserProfile.objects.get_or_create(user=request.user)
+                
                 # Get priority from user profile
-                priority_level = request.user.profile.get_priority_level()
+                priority_level = profile.get_priority_level()
                 queue_number = generate_queue_number(service)
                 position = calculate_position(service, priority_level)
                 

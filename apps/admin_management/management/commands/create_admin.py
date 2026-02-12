@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
+from apps.accounts.models import UserProfile
 import os
 
 
@@ -22,6 +23,12 @@ class Command(BaseCommand):
         user.is_staff = True
         user.is_superuser = True
         user.save()
+        
+        # Create or update UserProfile for the admin user
+        profile, profile_created = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={'citizen_type': 'regular', 'is_verified': True}
+        )
         
         if created:
             self.stdout.write(
