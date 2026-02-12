@@ -1,0 +1,87 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Verify User Status - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">User Verification Status: {{ user.get_full_name }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="user-info mb-4">
+                    <h6 class="text-muted">User Information</h6>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="fw-bold w-25">Username:</td>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Email:</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Account Status:</td>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Joined:</td>
+                            <td>{{ user.date_joined|date:"F d, Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="text-muted">Verification Status</h6>
+                {% if verification %}
+                    <div class="verification-details">
+                        <table class="table table-sm">
+                            <tr>
+                                <td class="fw-bold w-25">Verification Status:</td>
+                                <td>
+                                    {% if verification.is_verified %}
+                                        <span class="badge bg-success">Verified</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if verification.is_verified and verification.verification_date %}
+                            <tr>
+                                <td class="fw-bold">Verified On:</td>
+                                <td>{{ verification.verification_date|date:"F d, Y H:i" }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if verification.id_number %}
+                            <tr>
+                                <td class="fw-bold">ID Number:</td>
+                                <td>{{ verification.id_number }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No verification information available.</p>
+                {% endif %}
+
+                <div class="mt-4">
+                    <a href="{% url 'admin_management:check_account_status' verification.id %}" class="btn btn-info">
+                        <i class="bi bi-arrow-left"></i> Back to Account Status
+                    </a>
+                    <a href="{% url 'admin_management:users_management' %}" class="btn btn-secondary">
+                        <i class="bi bi-list"></i> Users Management
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

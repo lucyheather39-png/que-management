@@ -1,0 +1,57 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Unverified Users - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Unverified Users</h5>
+                <span class="badge bg-warning">{{ total_unverified }}</span>
+            </div>
+            <div class="card-body">
+                {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Citizen Type</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td><strong>{{ user.user.get_full_name }}</strong></td>
+                                        <td>{{ user.user.email }}</td>
+                                        <td>{{ user.get_citizen_type_display }}</td>
+                                        <td>
+                                            <span class="badge bg-warning">Unverified</span>
+                                        </td>
+                                        <td>{{ user.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'admin_management:verify_user_account' user.user.id %}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-check-circle"></i> Verify
+                                            </a>
+                                            <a href="{% url 'admin_management:check_account_status' user.id %}" class="btn btn-sm btn-info">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center py-4">No unverified users found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

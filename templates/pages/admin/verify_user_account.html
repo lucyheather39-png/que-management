@@ -1,0 +1,71 @@
+{% extends 'layouts/admin_base.html' %}
+
+{% block title %}Verify User Account - Queue Management System{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Verify User Account</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> Review user information before verification
+                </div>
+                
+                <div class="user-info mb-4">
+                    <h6 class="text-muted">User Details</h6>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="fw-bold">Name:</td>
+                            <td>{{ user.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Email:</td>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Username:</td>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Joined:</td>
+                            <td>{{ user.date_joined|date:"F d, Y H:i" }}</td>
+                        </tr>
+                        {% if user.profile %}
+                        <tr>
+                            <td class="fw-bold">Citizen Type:</td>
+                            <td>{{ user.profile.get_citizen_type_display }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+
+                {% if check_result.can_verify %}
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Verification Reason (Optional)</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Enter reason for verification..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Verify User
+                            </button>
+                            <a href="{% url 'admin_management:users_management' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Cannot Verify:</strong>
+                        <p class="mb-0">{{ check_result.message }}</p>
+                    </div>
+                    <a href="{% url 'admin_management:users_management' %}" class="btn btn-secondary">Back</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

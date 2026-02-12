@@ -284,44 +284,28 @@ def pending_appointments_view(request):
 
 @admin_required
 def manage_appointment_view(request, appointment_id):
-    import logging
-    logger = logging.getLogger(__name__)
+    appointment = get_object_or_404(Appointment, id=appointment_id)
     
-    try:
-        appointment = get_object_or_404(Appointment, id=appointment_id)
-        
-        if request.method == 'POST':
-            status = request.POST.get('status')
-            if status in ['approved', 'rejected']:
-                appointment.status = status
-                appointment.approved_by = request.user
-                appointment.save()
-                
-                AdminLog.objects.create(
-                    admin=request.user,
-                    action='Appointment Management',
-                    description=f"Appointment {status.capitalize()} for {appointment.user.get_full_name()}"
-                )
-                
-                messages.success(request, f'Appointment {status} successfully!')
-                return redirect('admin_management:pending_appointments')
-            else:
-                messages.error(request, 'Invalid status selected.')
-        
-        context = {
-            'appointment': appointment,
-        }
-        return render(request, 'pages/admin/manage_appointment.html', context)
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        if status in ['approved', 'rejected']:
+            appointment.status = status
+            appointment.approved_by = request.user
+            appointment.save()
+            
+            AdminLog.objects.create(
+                admin=request.user,
+                action='Appointment Management',
+                description=f"Appointment {status.capitalize()} for {appointment.user.get_full_name()}"
+            )
+            
+            messages.success(request, f'Appointment {status} successfully!')
+            return redirect('admin_management:pending_appointments')
     
-    except Appointment.DoesNotExist:
-        logger.warning(f'Admin {request.user.id} tried to access non-existent appointment {appointment_id}')
-        messages.error(request, f'Appointment with ID {appointment_id} not found.')
-        return redirect('admin_management:pending_appointments')
-    
-    except Exception as e:
-        logger.exception(f'Error in manage_appointment_view for user {request.user.id}: {str(e)}')
-        messages.error(request, 'An error occurred while loading the appointment.')
-        return redirect('admin_management:pending_appointments')
+    context = {
+        'appointment': appointment,
+    }
+    return render(request, 'pages/admin/manage_appointment.html', context)
 
 @admin_required
 def queue_management_view(request):
@@ -405,6 +389,7 @@ def check_account_status_view(request, user_profile_id):
     return render(request, 'pages/admin/check_account_status.html', context)
 
 
+@admin_required
 @admin_required
 def verify_user_profile_view(request, user_profile_id):
     """Verify a user profile"""
@@ -527,6 +512,7 @@ def delete_admin_view(request, admin_id):
 
 # Status Verification Views
 
+@admin_required
 @admin_required
 def verify_user_status_view(request, user_id):
     """View to verify user's verification status"""
@@ -656,6 +642,7 @@ def user_verification_stats_view(request):
 
 
 @admin_required
+@admin_required
 def unverified_users_view(request):
     """View all unverified users"""
     data = get_all_unverified_users()
@@ -691,6 +678,7 @@ def inactive_users_view(request):
     return render(request, 'pages/admin/inactive_users.html', context)
 
 
+@admin_required
 @admin_required
 def verify_user_account_view(request, user_id):
     """Verify a user account"""
