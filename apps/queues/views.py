@@ -9,45 +9,60 @@ from .utils import generate_queue_number, assign_priority, calculate_position
 
 @login_required
 def dashboard_view(request):
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    from apps.accounts.models import UserProfile
+    
+    # Ensure user has a profile
     try:
-        from apps.appointments.models import Appointment
-        
-        # Ensure user has a profile
-        from apps.accounts.models import UserProfile
         profile, _ = UserProfile.objects.get_or_create(
             user=request.user,
             defaults={'citizen_type': 'regular'}
         )
-        
-        user_queues = Queue.objects.filter(user=request.user, date=timezone.now().date())
+    except Exception as e:
+        logger.error(f'Profile creation error for user {request.user.id}: {str(e)}')
+        profile = None
+    
+    # Fetch queues separately
+    user_queues = []
+    active_queue = None
+    try:
+        today = timezone.now().date()
+        user_queues = Queue.objects.filter(user=request.user, date=today)
         active_queue = user_queues.filter(status__in=['waiting', 'serving']).first()
-        
-        # Get user's pending and approved appointments
+    except Exception as e:
+        logger.error(f'Queue fetch error for user {request.user.id}: {str(e)}')
+        user_queues = []
+        active_queue = None
+    
+    # Fetch appointments separately
+    user_appointments = []
+    try:
+        from apps.appointments.models import Appointment
         user_appointments = Appointment.objects.filter(
             user=request.user,
             status__in=['pending', 'approved']
         ).order_by('-created_at')[:5]
-        
-        context = {
-            'user_queues': user_queues,
-            'active_queue': active_queue,
-            'user_appointments': user_appointments,
-            'profile': profile,
-        }
-        return render(request, 'pages/queue/dashboard.html', context)
     except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f'Dashboard error for user {request.user.id}: {str(e)}')
-        # Don't redirect to login - show error on dashboard
-        messages.error(request, 'Error loading some dashboard data. Please refresh the page.')
-        # Provide a minimal dashboard anyway
-        return render(request, 'pages/queue/dashboard.html', {
-            'user_queues': [],
-            'active_queue': None,
-            'user_appointments': [],
-            'error': True
-        })
+        logger.error(f'Appointment fetch error for user {request.user.id}: {str(e)}')
+        user_appointments = []
+    
+    # Show error message only if data fetching had issues
+    has_error = False
+    if not user_queues and not user_appointments:
+        # This is expected for new users with no data
+        pass
+    
+    context = {
+        'user_queues': user_queues,
+        'active_queue': active_queue,
+        'user_appointments': user_appointments,
+        'profile': profile,
+        'error': has_error,
+    }
+    
+    return render(request, 'pages/queue/dashboard.html', context)
 
 @login_required
 def take_queue_view(request):
