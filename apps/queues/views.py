@@ -12,6 +12,13 @@ def dashboard_view(request):
     try:
         from apps.appointments.models import Appointment
         
+        # Ensure user has a profile
+        from apps.accounts.models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'citizen_type': 'regular'}
+        )
+        
         user_queues = Queue.objects.filter(user=request.user, date=timezone.now().date())
         active_queue = user_queues.filter(status__in=['waiting', 'serving']).first()
         
@@ -25,11 +32,22 @@ def dashboard_view(request):
             'user_queues': user_queues,
             'active_queue': active_queue,
             'user_appointments': user_appointments,
+            'profile': profile,
         }
         return render(request, 'pages/queue/dashboard.html', context)
     except Exception as e:
-        messages.error(request, f'Error loading dashboard: {str(e)}')
-        return redirect('security:login')
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Dashboard error for user {request.user.id}: {str(e)}')
+        # Don't redirect to login - show error on dashboard
+        messages.error(request, 'Error loading some dashboard data. Please refresh the page.')
+        # Provide a minimal dashboard anyway
+        return render(request, 'pages/queue/dashboard.html', {
+            'user_queues': [],
+            'active_queue': None,
+            'user_appointments': [],
+            'error': True
+        })
 
 @login_required
 def take_queue_view(request):
