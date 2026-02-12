@@ -274,6 +274,7 @@ def approve_verification_view(request, verification_id):
     return render(request, 'pages/admin/approve_verification.html', context)
 
 @admin_required
+@admin_required
 def pending_appointments_view(request):
     appointments = Appointment.objects.filter(status='pending').order_by('-created_at')
     
