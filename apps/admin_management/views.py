@@ -284,28 +284,44 @@ def pending_appointments_view(request):
 
 @admin_required
 def manage_appointment_view(request, appointment_id):
-    appointment = get_object_or_404(Appointment, id=appointment_id)
+    import logging
+    logger = logging.getLogger(__name__)
     
-    if request.method == 'POST':
-        status = request.POST.get('status')
-        if status in ['approved', 'rejected']:
-            appointment.status = status
-            appointment.approved_by = request.user
-            appointment.save()
-            
-            AdminLog.objects.create(
-                admin=request.user,
-                action='Appointment Management',
-                description=f"Appointment {status.capitalize()} for {appointment.user.get_full_name()}"
-            )
-            
-            messages.success(request, f'Appointment {status} successfully!')
-            return redirect('admin_management:pending_appointments')
+    try:
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+        
+        if request.method == 'POST':
+            status = request.POST.get('status')
+            if status in ['approved', 'rejected']:
+                appointment.status = status
+                appointment.approved_by = request.user
+                appointment.save()
+                
+                AdminLog.objects.create(
+                    admin=request.user,
+                    action='Appointment Management',
+                    description=f"Appointment {status.capitalize()} for {appointment.user.get_full_name()}"
+                )
+                
+                messages.success(request, f'Appointment {status} successfully!')
+                return redirect('admin_management:pending_appointments')
+            else:
+                messages.error(request, 'Invalid status selected.')
+        
+        context = {
+            'appointment': appointment,
+        }
+        return render(request, 'pages/admin/manage_appointment.html', context)
     
-    context = {
-        'appointment': appointment,
-    }
-    return render(request, 'pages/admin/manage_appointment.html', context)
+    except Appointment.DoesNotExist:
+        logger.warning(f'Admin {request.user.id} tried to access non-existent appointment {appointment_id}')
+        messages.error(request, f'Appointment with ID {appointment_id} not found.')
+        return redirect('admin_management:pending_appointments')
+    
+    except Exception as e:
+        logger.exception(f'Error in manage_appointment_view for user {request.user.id}: {str(e)}')
+        messages.error(request, 'An error occurred while loading the appointment.')
+        return redirect('admin_management:pending_appointments')
 
 @admin_required
 def queue_management_view(request):
