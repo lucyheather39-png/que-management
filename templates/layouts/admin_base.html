@@ -48,7 +48,9 @@
                     if (href && !href.startsWith('http')) {
                         // Add cache-buster parameter using current timestamp
                         const separator = href.includes('?') ? '&' : '?';
-                        this.setAttribute('href', href + separator + '_v=' + Date.now());
+                        const newHref = href + separator + '_v=' + Date.now();
+                        e.preventDefault();
+                        window.location.href = newHref;
                     }
                 });
             });
